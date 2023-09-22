@@ -1,0 +1,124 @@
+---
+title: "Lollipop_chart_Neuts_metabolism"
+author: "DSS"
+output: html_document
+date: "2023-09-13"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#install.packages("ggpubr")
+#install.packages("gcookbook")
+install.packages("ggbreak")
+```
+
+
+```{r}
+library(ggplot2)
+library(ggpubr)
+library(stringr)
+library(gcookbook)
+library(ggplot2)
+library(ggbreak) 
+library(patchwork)
+```
+
+
+```{r}
+# Load data
+
+lollidata <- read.csv2("lollidata_GO_short.csv", header = TRUE, dec = ".")
+#lollidata$V2 <- as.numeric(lollidata$V2)
+lollidata
+
+#Change the , to decimal point and from character to numeric, and add spaces in pathway names
+#lollidata$Pathway<- str_replace_all(lollidata$Pathway, "\xa0", " ")
+
+lollidata$pval<- str_replace_all(lollidata$pval, ",", ".")
+lollidata$pval <- as.numeric(lollidata$pval)
+
+lollidata$padj<- str_replace_all(lollidata$padj, ",", ".")
+lollidata$padj <- as.numeric(lollidata$padj)
+
+lollidata$log2err<- str_replace_all(lollidata$log2err, ",", ".")
+lollidata$log2err <- as.numeric(lollidata$log2err)
+
+lollidata$ES<- str_replace_all(lollidata$ES, ",", ".")
+lollidata$ES <- as.numeric(lollidata$ES)
+
+lollidata$NES<- str_replace_all(lollidata$NES, ",", ".")
+lollidata$NES <- as.numeric(lollidata$NES)
+
+
+
+lollidata2 <- lollidata
+
+logpadj <- (-log(lollidata2$padj))
+
+print(logpadj)
+lollidata2 <- cbind(lollidata2, logpadj)
+lollidata2
+lollidata2$pathway <-substring(lollidata2$pathway, 13)
+  
+lollidata2  
+  
+
+  
+  
+```
+
+
+
+
+
+
+
+```{r}
+
+
+dotplot <- ggdotchart(lollidata2, x = "pathway", y = "NES",
+           color = "NES",                                # Color by groups
+           palette = c("orange", "white", "purple"), # Custom color palette
+           sorting = "descending",                       # Sort value in descending order
+           add = "segments",                             # Add segments from y = 0 to dots
+           rotate = TRUE,
+           repel=FALSE,
+           shape = 19,
+           add.params = list(color = "NES" ,size = 0.9), # Change segment color and size
+           #group = "cyl",                                # Order by groups
+           dot.size = 4,                                 # Large dot size
+           label = round(lollidata2$NES,2),                        # Add mpg values as dot labels
+           font.label = list(color = "black", size = 10, face="bold", 
+                             vjust = -0.4, hjust = 1.5),               # Adjust label parameters
+           ggtheme = theme_bw()
+           )+
+  #scale_size("logpadj")+
+  geom_hline(yintercept = 0, linetype = 5, color = "lightgray")
+
+
+dotplot2 <- ggpar(dotplot, orientation = "vertical")
+dotplot2 <- dotplot2 + scale_y_break(c(-1.5,1.5))
+#dotplot2 <- ggpar(dotplot2, ylim = c(-3,3))
+#dotplot2 <- ggpar(dotplot2, orientation = "horizontal")
+
+
+
+dotplot2 <- dotplot2 + gradient_color(c("red", "white", "blue"))
+
+#dotplot2 <- dotplot2 + bgcolor("white")
+dotplot2 <- dotplot2 + ylim(-2.5,2.5)
+#dotplot2 <- ggpar(dotplot, orientation = "horizontal")
+dotplot2
+
+
+
+
+
+```
+
+
