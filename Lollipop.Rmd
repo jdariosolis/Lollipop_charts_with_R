@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #install.packages("ggpubr")
 #install.packages("gcookbook")
-install.packages("ggbreak")
+#install.packages("ggbreak")
 ```
 
 
@@ -60,27 +60,18 @@ lollidata2 <- lollidata
 
 logpadj <- (-log(lollidata2$padj))
 
-print(logpadj)
 lollidata2 <- cbind(lollidata2, logpadj)
 lollidata2
 lollidata2$pathway <-substring(lollidata2$pathway, 13)
   
 lollidata2  
-  
-
-  
-  
 ```
 
 
 
 
-
-
-
 ```{r}
-
-
+#Create the actual plot
 dotplot <- ggdotchart(lollidata2, x = "pathway", y = "NES",
            color = "NES",                                # Color by groups
            palette = c("orange", "white", "purple"), # Custom color palette
@@ -101,6 +92,7 @@ dotplot <- ggdotchart(lollidata2, x = "pathway", y = "NES",
   geom_hline(yintercept = 0, linetype = 5, color = "lightgray")
 
 
+#And modify it with ggpar
 dotplot2 <- ggpar(dotplot, orientation = "vertical")
 dotplot2 <- dotplot2 + scale_y_break(c(-1.5,1.5))
 #dotplot2 <- ggpar(dotplot2, ylim = c(-3,3))
